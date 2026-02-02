@@ -1,0 +1,106 @@
+/* --- CLASSE BASE (Formato e Efeitos de Vidro) --- */
+/* Todos os botões usarão esta classe */
+.btn-base {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 120px;
+    border-radius: 15px;
+    
+    /* Glassmorphism */
+    background-color: #0d1116;
+    border: 2px solid #e0e0e0;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    
+    cursor: pointer;
+
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                border-color 0.3s ease, 
+                box-shadow 0.3s ease;
+}
+
+/* Configuração padrão do elemento interno (onde vai o logo) */
+.btn-base::after {
+    content: '';
+    display: block;
+    width: 60%;
+    height: 60%;
+    
+    /* Configurações de Máscara (Padrão para todos) */
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    
+    /* Cor padrão do logo (Cinza escuro) */
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+/* Efeito de Hover (Crescer) */
+.btn-base:hover {
+    transform: scale(1.15);
+    background-color: #0d1116;
+    box-shadow: 0 10px 20px rgba(170, 24, 44, 0.25);
+}
+
+/* --- 2. CLASSES ESPECÍFICAS (Logos e Cores de cada marca) --- */
+
+/* FIAT */
+.fiat::after {
+    -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f8/Fiat_logo.svg');
+    mask-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f8/Fiat_logo.svg');
+}
+.fiat:hover {
+    border-color: #A70331;
+    box-shadow: 0 8px 25px rgba(167, 3, 49, 0.6);
+}      /* Borda Vermelha */
+.fiat:hover::after { background-color: #A70331; } /* Logo Vermelho */
+
+/* JEEP */
+.jeep::after {
+    -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/7/7e/Jeep.svg');
+    mask-image: url('https://upload.wikimedia.org/wikipedia/commons/7/7e/Jeep.svg');
+}
+.jeep:hover {
+    border-color: #ffba00;
+    box-shadow: 0 8px 25px rgba(255, 186, 0, 0.6)
+}      /* Borda Amarela/Ouro */
+.jeep:hover::after { background-color: #ffba00; } /* Logo Amarelo */
+
+/* PEUGEOT */
+.peugeot::after {
+    -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f7/Peugeot_Logo.svg');
+    mask-image: url('https://upload.wikimedia.org/wikipedia/commons/f/f7/Peugeot_Logo.svg');
+}
+.peugeot:hover {
+    border-color: #255398;
+    box-shadow: 0 8px 25px rgba(37, 83, 152, 0.7);
+}
+.peugeot:hover:after { background-color: #255398}
+
+/* CITROEN */
+.citroen::after {
+    -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/d/dd/Citroen_2022.svg');
+    mask-image: url('https://upload.wikimedia.org/wikipedia/commons/d/dd/Citroen_2022.svg');
+}
+.citroen:hover {
+    border-color: #7a99ac;
+    box-shadow: 0 8px 25px rgba(122, 153, 172, 0.6);
+}
+.citroen:hover:after { background-color: #7a99ac}
+
+/* RAM */
+.ram::after {
+    -webkit-mask-image: url('https://upload.wikimedia.org/wikipedia/commons/5/58/Ram_Trucks_2009_wordmark.svg');
+    mask-image: url('https://upload.wikimedia.org/wikipedia/commons/5/58/Ram_Trucks_2009_wordmark.svg');
+}
+.ram:hover {
+    border-color: #e64a19;
+    box-shadow: 0 8px 25px rgba(230, 74, 25, 0.6);
+}
+.ram:hover:after { background-color: #e64a19}
