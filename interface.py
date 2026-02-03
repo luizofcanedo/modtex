@@ -3,6 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 import pandas as pd
 import words_list
+from st_click_detector import click_detector
+import html_bs
+import time
 
 st.set_page_config(
     page_title="Modelos Textuais",
@@ -18,202 +21,288 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-def carregar_css(file_path):
-    with open(file_path) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+with open("assets/style.css") as f:
+    css_content = f.read()
+st.markdown(f'<style>{css_content}</style>', unsafe_allow_html=True)
 
-carregar_css("assets/style.css")
-
-col1, col2, col3 = st.columns(3, gap="large")
-
-# BOTÕES DE CIMA
-with col1:
-    st.markdown("""
-        <div style="text-align: center;">
-            <button class="btn-base fiat" onclick="alert('Fiat selecionado')"></button>
+def botao_customizado(nome_marca, css_class):
+    btn_id = f"btn_{css_class}"
+    
+    html_code = f"""
+        <style>
+            {css_content}
+        </style>
+        
+        <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+            <a href="#" id="{btn_id}" style="text-decoration: none;">
+                <div class="btn-base {css_class}"></div>
+            </a>
         </div>
-    """, unsafe_allow_html=True)
+    """
 
-    st.space('small')
+    detector_response = click_detector(html_code)
     
-    sub_col1, sub_col2 = st.columns(2, border=True)
+    if detector_response == btn_id:
+        if st.session_state.get('marca_selecionada') != nome_marca:
+            st.session_state['marca_selecionada'] = nome_marca
+            st.rerun()
+            return True
+    return st.session_state.get('marca_selecionada') == nome_marca
 
-    with sub_col1:
-        top_words = words_list.calcular_lift_por_marca('Fiat', 1, sort=False)
-        palavra_top = top_words.index[0]
-        score_top = top_words.values[0]
+marca_atual = st.session_state.get('marca_selecionada')
+
+if not marca_atual:
+
+    with st.spinner("Loading..."):
+        time.sleep(0.8)
+
+        col1, col2, col3 = st.columns(3, gap="large")
+
+        # BOTÕES DE CIMA
+        with col1:
+
+            is_fiat_active = botao_customizado("Fiat", "fiat")
         
-        st.metric(
-            label="Palavra mais recorrente",
-            value=palavra_top,
-            delta=f"{score_top:.2f}",
-            delta_color="normal",
-            width="stretch",
-        )
+            sub_col1, sub_col2 = st.columns(2, border=True)
 
-    with sub_col2:
-        bot_words = words_list.calcular_lift_por_marca('Fiat', 1, sort=True)
-        palavra_bot = bot_words.index[0]
-        score_bot = bot_words.values[0]
+            with sub_col1:
+                top_words = words_list.calcular_lift_por_marca('Fiat', 1, sort=False)
+                palavra_top = top_words.index[0]
+                score_top = top_words.values[0]
+            
+                st.metric(
+                    label="Palavra mais recorrente",
+                    value=palavra_top,
+                    delta=f"{score_top:.2f}",
+                    delta_color="normal",
+                    width="stretch",
+                )
 
-        st.metric(
-            label="Palavra menos recorrente", 
-            value=palavra_bot, 
-            delta=f"{score_bot:.2f}", 
-            delta_color="normal",
-            width="stretch",
-        )
+            with sub_col2:
+                bot_words = words_list.calcular_lift_por_marca('Fiat', 1, sort=True)
+                palavra_bot = bot_words.index[0]
+                score_bot = bot_words.values[0]
 
-with col2:
-    st.markdown("""
-        <div style="text-align: center;">
-            <button class="btn-base jeep" onclick="alert('Jeep selecionado')"></button>
-        </div>
-    """, unsafe_allow_html=True)
+                st.metric(
+                    label="Palavra menos recorrente", 
+                    value=palavra_bot, 
+                    delta=f"{score_bot:.2f}", 
+                    delta_color="normal",
+                    width="stretch",
+                )
 
-    st.space('small')
+        with col2:
+        
+            is_fiat_active = botao_customizado("Jeep", "jeep")
+        
+            sub_col1, sub_col2 = st.columns(2, border=True)
+
+            with sub_col1:
+                top_words = words_list.calcular_lift_por_marca('Jeep', 1, sort=False)
+                palavra_top = top_words.index[0]
+                score_top = top_words.values[0]
+            
+                st.metric(
+                    label="Palavra mais recorrente",
+                    value=palavra_top,
+                    delta=f"{score_top:.2f}",
+                    delta_color="normal",
+                    width="stretch",
+                )
+
+            with sub_col2:
+                bot_words = words_list.calcular_lift_por_marca('Jeep', 1, sort=True)
+                palavra_bot = bot_words.index[0]
+                score_bot = bot_words.values[0]
+            
+                st.metric(
+                    label="Palavra menos recorrente", 
+                    value=palavra_bot, 
+                    delta=f"{score_bot:.2f}", 
+                    delta_color="normal",
+                    width="stretch",
+                )
+
+        with col3:
+        
+            is_fiat_active = botao_customizado("Peugeot", "peugeot")
+        
+            sub_col1, sub_col2 = st.columns(2, border=True)
+
+            with sub_col1:
+                top_words = words_list.calcular_lift_por_marca('Peugeot', 1, sort=False)
+                palavra_top = top_words.index[0]
+                score_top = top_words.values[0]
+            
+                st.metric(
+                    label="Palavra mais recorrente",
+                    value=palavra_top,
+                    delta=f"{score_top:.2f}",
+                    delta_color="normal",
+                    width="stretch",
+                )
+
+            with sub_col2:
+                bot_words = words_list.calcular_lift_por_marca('Peugeot', 1, sort=True)
+                palavra_bot = bot_words.index[0]
+                score_bot = bot_words.values[0]
+            
+                st.metric(
+                    label="Palavra menos recorrente", 
+                    value=palavra_bot, 
+                    delta=f"{score_bot:.2f}", 
+                    delta_color="normal",
+                    width="stretch",
+                )
+
+        #Espaço entre botões
+        st.space('large')
+
+        # BOTÕES DE BAIXO
+        col1, col2 = st.columns(2, gap="large")
+
+        with col1:
+        
+            is_fiat_active = botao_customizado("Citroen", "citroen")
+        
+            sub_col1, sub_col2 = st.columns(2, border=True)
+
+            with sub_col1:
+                top_words = words_list.calcular_lift_por_marca('Citroen', 1, sort=False)
+                palavra_top = top_words.index[0]
+                score_top = top_words.values[0]
+            
+                st.metric(
+                    label="Palavra mais recorrente",
+                    value=palavra_top,
+                    delta=f"{score_top:.2f}",
+                    delta_color="normal",
+                    width="stretch",
+            )
+
+        with sub_col2:
+            bot_words = words_list.calcular_lift_por_marca('Citroen', 1, sort=True)
+            palavra_bot = bot_words.index[0]
+            score_bot = bot_words.values[0]
+            
+            st.metric(
+                label="Palavra menos recorrente", 
+                value=palavra_bot, 
+                delta=f"{score_bot:.2f}", 
+                delta_color="normal",
+                width="stretch",
+            )
+
+        with col2:
+        
+            is_fiat_active = botao_customizado("Ram", "ram")
+        
+            sub_col1, sub_col2 = st.columns(2, border=True)
+
+            with sub_col1:
+                top_words = words_list.calcular_lift_por_marca('RAM', 1, sort=False)
+                palavra_top = top_words.index[0]
+                score_top = top_words.values[0]
+            
+                st.metric(
+                    label="Palavra mais recorrente",
+                    value=palavra_top,
+                    delta=f"{score_top:.2f}",
+                    delta_color="normal",
+                    width="stretch",
+                )
+
+            with sub_col2:
+                bot_words = words_list.calcular_lift_por_marca('RAM', 1, sort=True)
+                palavra_bot = bot_words.index[0]
+                score_bot = bot_words.values[0]
+            
+                st.metric(
+                    label="Palavra menos recorrente", 
+                    value=palavra_bot, 
+                    delta=f"{score_bot:.2f}", 
+                    delta_color="normal",
+                    width="stretch",
+                )
+
+else:
     
-    sub_col1, sub_col2 = st.columns(2, border=True)
+    with st.spinner("Loading..."):
+        time.sleep(0.8)
 
-    with sub_col1:
-        top_words = words_list.calcular_lift_por_marca('Jeep', 1, sort=False)
-        palavra_top = top_words.index[0]
-        score_top = top_words.values[0]
-        
-        st.metric(
-            label="Palavra mais recorrente",
-            value=palavra_top,
-            delta=f"{score_top:.2f}",
-            delta_color="normal",
-            width="stretch",
-        )
+        if marca_atual == 'Fiat':
+            
+            col_voltar, col_vazia, col_logo, col_vazia = st.columns([1, 3, 1, 4], border=False)
+            with col_voltar:
+                if st.button("<-"):
+                    st.session_state['marca_selecionada'] = None
+                    st.rerun()
+            with col_logo:
+                st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Fiat_logo.svg/1280px-Fiat_logo.svg.png", width=150)
+            with col_vazia:
+                st.empty()
 
-    with sub_col2:
-        bot_words = words_list.calcular_lift_por_marca('Jeep', 1, sort=True)
-        palavra_bot = bot_words.index[0]
-        score_bot = bot_words.values[0]
-        
-        st.metric(
-            label="Palavra menos recorrente", 
-            value=palavra_bot, 
-            delta=f"{score_bot:.2f}", 
-            delta_color="normal",
-            width="stretch",
-        )
+            st.space()
 
-with col3:
-    st.markdown("""
-        <div style="text-align: center;">
-            <button class="btn-base peugeot" onclick="alert('Peugeot selecionado')"></button>
-        </div>
-    """, unsafe_allow_html=True)
+            col_top_words, col_bot_words = st.columns(2, border=False)
+            with col_top_words:
+                
+                sc1, sc2, sc3 = st.columns(3)
+                with sc1:
+                    st.subheader('TOP WORDS', anchor=False, divider="red")
+                with sc2:
+                    st.subheader('SCORE', anchor=False, divider="red")
+                with sc3:
+                    st.subheader('KM MÉDIO', anchor=False, divider="red")
 
-    st.space('small')
-    
-    sub_col1, sub_col2 = st.columns(2, border=True)
+                sub_col_words, sub_col_scores, sub_col_km_medio = st.columns(3, vertical_alignment="top", border=False)
+                for i in range(10):
+                    
+                    top_words = words_list.calcular_lift_por_marca('Fiat', 10, sort=False)
+                    palavra_top = top_words.index[i]
+                    score_top = top_words.values[i]
+                
+                    with sub_col_words:
+                        if st.button(label=palavra_top):
+                            st.write("Em construção")
+                
+                    with sub_col_scores:
+                        badge_html = html_bs.html_delta(score_top)
+                        st.markdown(badge_html, unsafe_allow_html=True)
+                        st.space(size="stretch")
+                    
+                    with sub_col_km_medio:
+                        km_medio = words_list.km_medio(target_word=palavra_top, marca_alvo='Fiat')
+                        st.markdown(f"{km_medio:.0f}")
+                        st.space(size="stretch")
 
-    with sub_col1:
-        top_words = words_list.calcular_lift_por_marca('Peugeot', 1, sort=False)
-        palavra_top = top_words.index[0]
-        score_top = top_words.values[0]
-        
-        st.metric(
-            label="Palavra mais recorrente",
-            value=palavra_top,
-            delta=f"{score_top:.2f}",
-            delta_color="normal",
-            width="stretch",
-        )
+            with col_bot_words:
 
-    with sub_col2:
-        bot_words = words_list.calcular_lift_por_marca('Peugeot', 1, sort=True)
-        palavra_bot = bot_words.index[0]
-        score_bot = bot_words.values[0]
-        
-        st.metric(
-            label="Palavra menos recorrente", 
-            value=palavra_bot, 
-            delta=f"{score_bot:.2f}", 
-            delta_color="normal",
-            width="stretch",
-        )
+                sc1, sc2, sc3 = st.columns(3)
+                with sc1:
+                    st.subheader('BOT WORDS', anchor=False, divider="red")
+                with sc2:
+                    st.subheader('SCORE', anchor=False, divider="red")
+                with sc3:
+                    st.subheader('MARCAS', anchor=False, divider="red")
+                
+                sub_col_words, sub_col_scores, sub_col_marcas = st.columns(3, vertical_alignment="top", border=False)
+                for i in range(10):
+                    
+                    bot_words = words_list.calcular_lift_por_marca('Fiat', 10, sort=True)
+                    palavra_bot = bot_words.index[i]
+                    score_bot = bot_words.values[i]
+                
+                    with sub_col_words:
+                        if st.button(label=palavra_bot):
+                            st.write("Em construção")
+                
+                    with sub_col_scores:
+                        badge_html = html_bs.html_delta(score_bot)
+                        st.markdown(badge_html, unsafe_allow_html=True)
+                        st.space(size="stretch")
 
-#Espaço entre botões
-st.space('large')
-
-# BOTÕES DE BAIXO
-col1, col2 = st.columns(2, gap="large")
-
-with col1:
-    st.markdown("""
-        <div style="text-align: center;">
-            <button class="btn-base citroen" onclick="alert('Citroën selecionado')"></button>
-        <div>       
-""", unsafe_allow_html=True)
-    
-    st.space('small')
-    
-    sub_col1, sub_col2 = st.columns(2, border=True)
-
-    with sub_col1:
-        top_words = words_list.calcular_lift_por_marca('Citroen', 1, sort=False)
-        palavra_top = top_words.index[0]
-        score_top = top_words.values[0]
-        
-        st.metric(
-            label="Palavra mais recorrente",
-            value=palavra_top,
-            delta=f"{score_top:.2f}",
-            delta_color="normal",
-            width="stretch",
-        )
-
-    with sub_col2:
-        bot_words = words_list.calcular_lift_por_marca('Citroen', 1, sort=True)
-        palavra_bot = bot_words.index[0]
-        score_bot = bot_words.values[0]
-        
-        st.metric(
-            label="Palavra menos recorrente", 
-            value=palavra_bot, 
-            delta=f"{score_bot:.2f}", 
-            delta_color="normal",
-            width="stretch",
-        )
-
-with col2:
-    st.markdown("""
-        <div style="text-align: center;">
-            <button class="btn-base ram" onclick="alert('Ram selecionado')"></button>
-        <div>       
-""", unsafe_allow_html=True)
-    
-    st.space('small')
-    
-    sub_col1, sub_col2 = st.columns(2, border=True)
-
-    with sub_col1:
-        top_words = words_list.calcular_lift_por_marca('RAM', 1, sort=False)
-        palavra_top = top_words.index[0]
-        score_top = top_words.values[0]
-        
-        st.metric(
-            label="Palavra mais recorrente",
-            value=palavra_top,
-            delta=f"{score_top:.2f}",
-            delta_color="normal",
-            width="stretch",
-        )
-
-    with sub_col2:
-        bot_words = words_list.calcular_lift_por_marca('RAM', 1, sort=True)
-        palavra_bot = bot_words.index[0]
-        score_bot = bot_words.values[0]
-        
-        st.metric(
-            label="Palavra menos recorrente", 
-            value=palavra_bot, 
-            delta=f"{score_bot:.2f}", 
-            delta_color="normal",
-            width="stretch",
-        )
+                    with sub_col_marcas:
+                        marcas_associadas = words_list.marcas_associadas(palavra_bot, marca_atual)
+                        st.markdown(marcas_associadas['marca'].values[0])
+                        st.space("stretch")

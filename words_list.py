@@ -3,6 +3,7 @@ import numpy as np
 from sqlalchemy import create_engine
 from sqlalchemy import URL
 import palavras_indesejadas
+import streamlit as st
 
 url_object = URL.create(
     "postgresql+psycopg2",
@@ -14,13 +15,14 @@ url_object = URL.create(
 )
 engine = create_engine(url_object)
 
+query = """
+    SELECT
+        "ac_des_atendimento" as ordem_servico, "ac_nom_marca" as marca, "os_num_km_atual" as km_medio
+    FROM
+        public.grow_os;
+"""
+
 def contagem_palavras():
-    query = """
-        SELECT
-            "ac_des_atendimento" as ordem_servico, "ac_nom_marca" as marca
-        FROM
-            public.grow_os;
-    """
 
     df = pd.read_sql(query, engine)
 
@@ -59,3 +61,20 @@ def calcular_lift_por_marca(marca_alvo, n, sort=bool):
 
     resultado = score_log[marca_alvo].sort_values(ascending=sort).head(n)
     return resultado
+
+def km_medio(target_word, marca_alvo):
+    df = pd.read_sql(query, engine)
+    df_filtrado_palavra = df[df['ordem_servico'].str.contains(target_word, case=False)]
+    df_filtrado_marca = df_filtrado_palavra[df_filtrado_palavra['marca'].str.contains(marca_alvo, case=False)]
+    km_medio = df_filtrado_marca['km_medio'].mean()
+
+    return km_medio
+
+def marcas_associadas(target_word, marca_alvo):
+    df = pd.read_sql(query, engine)
+    df_filtrado_palavra = df[df['ordem_servico'].str.contains(target_word, case=False)]
+    df_filtrado_marca = df_filtrado_palavra[df_filtrado_palavra['marca'] != marca_alvo]
+    df_counter = df_filtrado_marca.groupby(['marca']).size().reset_index(name='contagem')
+    df_sorted = df_counter.sort_values(by='contagem', ascending=False)
+
+    return df_sorted
