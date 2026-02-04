@@ -18,7 +18,10 @@ def palavras_indesejadas():
         'os', 'moto', 'retorno', 'manutenção', 'manhã', 'continua', 'caso', 'residencia', 'rodar', 'momento', 'outro', 'liguei', 'localiza', 'disso', 'silva', 'josé', 'commander', 'final',
         'gentileza', 'rebel', 'planta', 'agora', 'procon', 'dva', 'agora', 'verificar', 'depois', 'longitude', 'pouso', 'respuesta', 'funcionanada', 'atendimentos', 'europamotors', 'verifcar',
         'laramie', 'kênia', 'andré', 'día', 'confiat', 'partidabateria', 'amarelos', 'vermelhos', 'caio', 'ss', 'pulse', 'fin', 'forças', 'cadeado', 'pressa', 'del', 'amazonas', 'quebra', 'n',
-        'nota', 'tratamento', 'vocês', 'segue', 'imediato', 'prezados', 'acordo', 'privilege', 'reparado', 'breve', 'própria', 'fazem',
+        'nota', 'tratamento', 'vocês', 'segue', 'imediato', 'prezados', 'acordo', 'privilege', 'reparado', 'breve', 'própria', 'fazem', 'sai', 'senhora', 'obs', 'ra', 'csc', 'tudo', 'é', 'vazou',
+        'apresenta', 'isso', 'pedido', 'caixa', 'regional', 'p', 'garagem', 'mensagens', 'fábrica', 'mão', 'estão', 'falhando', 'deu', 'ainda', 'concessionária', 'guincho', 'tenho', 'dias', 'estava',
+        'como', 'já', 'fica', 'porém', 'esse', 'estou', 'senhor', 'sendo', 'varias', 'falta', 'tem', 'problemas', 'apareceu', 'fazendo', 'livre', 'aparece', 'perdeu', 'perdendo', 'devido', 'faz',
+        'todo', 'só', 'ficou',
 
         # --- NOVAS ADIÇÕES (Conectivos e Gramática) ---
         'o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas',

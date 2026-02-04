@@ -22,22 +22,46 @@ query = """
         public.grow_os;
 """
 
-def contagem_palavras():
+@st.cache_data(ttl=3600)
+def contagem_palavras(filter=False, target_word=None, marca_alvo=None, sorted=False):
 
-    df = pd.read_sql(query, engine)
+    if filter == False:
+        df = pd.read_sql(query, engine)
 
-    df['ordem_servico'] = df['ordem_servico'].astype(str).str.lower()
-    df_exploded = df.assign(words=df['ordem_servico'].str.split()).explode('words')
-    df_exploded = df_exploded.dropna(subset=['words'])
+        df['ordem_servico'] = df['ordem_servico'].astype(str).str.lower()
+        df_exploded = df.assign(words=df['ordem_servico'].str.split()).explode('words')
+        df_exploded = df_exploded.dropna(subset=['words'])
 
-    df_exploded['words'] = df_exploded['words'].str.replace(r'[^\w\s]', '', regex=True)
-    df_exploded = df_exploded[~df_exploded['words'].str.contains(r'\d', regex=True)]
-    palavras_ruins = set(palavras_indesejadas.palavras_indesejadas())
-    df_clean = df_exploded[~df_exploded['words'].isin(palavras_ruins)].copy()
-    df_clean = df_clean[df_clean['words'] != '']
-    df_contagem = df_clean.groupby(['marca', 'words']).size().reset_index(name='contagem')
+        df_exploded['words'] = df_exploded['words'].str.replace(r'[^\w\s]', '', regex=True)
+        df_exploded = df_exploded[~df_exploded['words'].str.contains(r'\d', regex=True)]
+        palavras_ruins = set(palavras_indesejadas.palavras_indesejadas())
+        df_clean = df_exploded[~df_exploded['words'].isin(palavras_ruins)].copy()
+        df_clean = df_clean[df_clean['words'] != '']
+        df_contagem = df_clean.groupby(['marca', 'words']).size().reset_index(name='contagem')
 
-    return df_contagem
+        return df_contagem
+    
+    else:
+        df = pd.read_sql(query, engine)
+
+        df_filtrado_palavra = df[df['ordem_servico'].str.contains(target_word, case=False)]
+
+        df_filtrado_palavra['ordem_servico'] = df_filtrado_palavra['ordem_servico'].astype(str).str.lower()
+        df_exploded = df_filtrado_palavra.assign(words=df_filtrado_palavra['ordem_servico'].str.split()).explode('words')
+        df_exploded = df_exploded.dropna(subset=['words'])
+        df_exploded = df_exploded[df_exploded['words'] != target_word]
+
+        df_exploded['words'] = df_exploded['words'].str.replace(r'[^\w\s]', '', regex=True)
+        df_exploded = df_exploded[~df_exploded['words'].str.contains(r'\d', regex=True)]
+        palavras_ruins = set(palavras_indesejadas.palavras_indesejadas())
+        df_clean = df_exploded[~df_exploded['words'].isin(palavras_ruins)].copy()
+        df_clean = df_clean[df_clean['words'] != '']
+        df_contagem = df_clean.groupby(['words']).size().reset_index(name='contagem')
+
+        if sorted == True:
+            df_sorted = df_contagem.sort_values(by='contagem',ascending=False).head(10)
+        
+        return df_sorted
 
 def calcular_lift_por_marca(marca_alvo, n, sort=bool):
     df_completo = contagem_palavras()
@@ -49,7 +73,7 @@ def calcular_lift_por_marca(marca_alvo, n, sort=bool):
         fill_value=0
     )
     
-    matriz = matriz[matriz.sum(axis=1) > 5]
+    matriz = matriz[matriz.sum(axis=1) > 50]
 
     smoothing = 1e-6
     
