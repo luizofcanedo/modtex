@@ -322,7 +322,10 @@ else:
                     
                         with sub_col_words:
                             if st.button(label=palavra_bot):
-                                st.write("Em construção")
+                                st.session_state['pagina_atual'] = 'detalhes_bot'
+                                st.session_state['botao_selecionado'] = palavra_bot
+                                st.session_state['valor_botao'] = score_bot
+                                st.rerun()
                     
                         with sub_col_scores:
                             badge_html = visuals.html_delta(score_bot)
@@ -335,6 +338,55 @@ else:
                             st.space("stretch")
 
             elif st.session_state['pagina_atual'] == 'detalhes':
+                botao = st.session_state['botao_selecionado']
+                valor_botao = st.session_state['valor_botao']
+
+                if marca_atual == 'Ram':
+                    marca_atual_atualizada = 'RAM'
+                else:
+                    marca_atual_atualizada = marca_atual
+
+                top_words = words_list.calcular_lift_por_marca(marca_atual_atualizada, 12, sort=True)
+
+                col_voltar, col_vazia, col_palavra, col_vazia = st.columns([1, 3, 1, 4])
+                with col_voltar:
+                    if st.button("<-"):
+                        st.session_state['pagina_atual'] = 'home'
+                        st.session_state['botao_selecionado'] = None
+                        st.session_state['valor_botao'] = None
+                        st.rerun()
+                with col_vazia:
+                    st.empty()
+                with col_palavra:
+                    st.metric(
+                        label="Palavra selecionada",
+                        value=botao,
+                        delta=f"{valor_botao:.2f}",
+                        border=True
+                    )
+                st.space("medium")
+
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    for i in range(0, 4):
+                        with st.container(border=True):
+                            palavra_relacionada = top_words.index[i]
+                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
+                            st.space("stretch")
+                with col2:
+                    for i in range(4, 8):
+                        with st.container(border=True):
+                            palavra_relacionada = top_words.index[i]
+                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
+                            st.space("stretch")
+                with col3:
+                    for i in range(8, 12):
+                        with st.container(border=True):
+                            palavra_relacionada = top_words.index[i]
+                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
+                            st.space("stretch")
+
+            elif st.session_state['pagina_atual'] == 'detalhes_bot':
                 botao = st.session_state['botao_selecionado']
                 valor_botao = st.session_state['valor_botao']
 
@@ -368,17 +420,17 @@ else:
                     for i in range(0, 4):
                         with st.container(border=True):
                             palavra_relacionada = top_words.index[i]
-                            st.subheader(f"{palavra_relacionada}", width="stretch")
+                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
                             st.space("stretch")
                 with col2:
                     for i in range(4, 8):
                         with st.container(border=True):
                             palavra_relacionada = top_words.index[i]
-                            st.subheader(f"{palavra_relacionada}", width="stretch")
+                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
                             st.space("stretch")
                 with col3:
                     for i in range(8, 12):
                         with st.container(border=True):
                             palavra_relacionada = top_words.index[i]
-                            st.subheader(f"{palavra_relacionada}", width="stretch")
+                            st.subheader(f"{palavra_relacionada}", width="stretch",anchor=False)
                             st.space("stretch")
