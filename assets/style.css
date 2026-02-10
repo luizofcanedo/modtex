@@ -104,3 +104,50 @@
     box-shadow: 0 8px 25px rgba(230, 74, 25, 0.6);
 }
 .ram:hover:after { background-color: #e64a19}
+
+/* --- ESTILO PARA BOTÕES DE TEXTO (Palavras) --- */
+
+.btn-word {
+    /* Centralização ABSOLUTA */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 350px;
+    height: 70px;
+    border-radius: 15px;
+
+    /* Estilo do Texto */
+    color: #e6edf3;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 10px;
+
+    background-color: #0d1116;
+    border: 2px solid #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+    cursor: pointer;
+
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+            border-color 0.3s ease,
+            box-shadow 0.3s ease;
+}
+
+.btn-word::after {
+    content: none !important;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Efeito Hover Neon para as palavras */
+.btn-word:hover {
+    border-color: #58a6ff !important;
+    color: #58a6ff !important;
+    box-shadow: 0 0 20px rgba(88, 166, 255, 0.2) !important;
+    transform: translateY(-4px);
+}

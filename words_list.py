@@ -7,11 +7,11 @@ import streamlit as st
 
 url_object = URL.create(
     "postgresql+psycopg2",
-    username='',
+    username='luizotavio',
     password='',
-    host='',
-    port='',
-    database=''
+    host='localhost',
+    port='5432',
+    database='stellantis'
 )
 engine = create_engine(url_object)
 
