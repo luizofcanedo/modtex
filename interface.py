@@ -1,18 +1,17 @@
 import streamlit as st
-from sqlalchemy import create_engine
-from sqlalchemy.exc import OperationalError
-import pandas as pd
 import words_list
 from st_click_detector import click_detector
 import visuals
 import time
 
+#-----------------------Configurações da página-----------------------#
 st.set_page_config(
     page_title="Modelos Textuais",
     page_icon="📚",
     layout="wide",
 )
 
+#-----------------Criando meu próprio script de botão para as marcas -----------------#
 st.markdown("""
     <style>
     [data-testid="stMetricValue"] {
@@ -49,6 +48,33 @@ def botao_customizado(nome_marca, css_class):
             return True
     return st.session_state.get('marca_selecionada') == nome_marca
 
+#-----------------script de botão genérico -----------------#
+def botao_palavra(texto):
+    st.markdown(f"""
+            <div class="btn-base btn-word" style="width: 100%; height: 100px; margin-bottom: 10px;">
+            {texto}
+        </div>
+        """, unsafe_allow_html=True)
+
+def botao_palavra_clicavel(palavra):
+    id_limpo = palavra.replace(" ", "_").lower()
+    btn_id = f"btn_{id_limpo}"
+    html_code = f"""
+        <style>
+            {css_content}
+        </style>
+        <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+            <a href="#" id="{btn_id}" style="text-decoration: none; color: inherit;">
+                <div class="btn-word btn-text">
+                    {palavra}
+                </div>
+            </a>
+        </div>
+    """
+    detector_response = click_detector(html_code)
+    return detector_response == btn_id
+
+#-----------------------------PÁGINA INICIAL-----------------------------#
 marca_atual = st.session_state.get('marca_selecionada')
 
 if not marca_atual:
@@ -58,13 +84,16 @@ if not marca_atual:
 
         col1, col2, col3 = st.columns(3, gap="large")
 
-        # BOTÕES DE CIMA
+        #---------------------BOTÕES DE CIMA-----------------------------#
+
+        #BOTÃO FIAT
         with col1:
 
             is_fiat_active = botao_customizado("Fiat", "fiat")
         
             sub_col1, sub_col2 = st.columns(2, border=True)
 
+            #DADOS FIAT TOP WORDS
             with sub_col1:
                 top_words = words_list.calcular_lift_por_marca('Fiat', 1, sort=False)
                 palavra_top = top_words.index[0]
@@ -78,6 +107,7 @@ if not marca_atual:
                     width="stretch",
                 )
 
+            #DADOS FIAT BOT WORDS
             with sub_col2:
                 bot_words = words_list.calcular_lift_por_marca('Fiat', 1, sort=True)
                 palavra_bot = bot_words.index[0]
@@ -91,12 +121,14 @@ if not marca_atual:
                     width="stretch",
                 )
 
+        #BOTÃO JEEP
         with col2:
         
             is_jeep_active = botao_customizado("Jeep", "jeep")
         
             sub_col1, sub_col2 = st.columns(2, border=True)
 
+            #DADOS JEEP TOP WORDS
             with sub_col1:
                 top_words = words_list.calcular_lift_por_marca('Jeep', 1, sort=False)
                 palavra_top = top_words.index[0]
@@ -110,6 +142,7 @@ if not marca_atual:
                     width="stretch",
                 )
 
+            #DADOS JEEP BOT WORDS
             with sub_col2:
                 bot_words = words_list.calcular_lift_por_marca('Jeep', 1, sort=True)
                 palavra_bot = bot_words.index[0]
@@ -123,12 +156,14 @@ if not marca_atual:
                     width="stretch",
                 )
 
+        #BOTÃO PEUGEOT
         with col3:
         
             is_peugeot_active = botao_customizado("Peugeot", "peugeot")
         
             sub_col1, sub_col2 = st.columns(2, border=True)
 
+            #DADOS PEUGEOT TOP WORDS
             with sub_col1:
                 top_words = words_list.calcular_lift_por_marca('Peugeot', 1, sort=False)
                 palavra_top = top_words.index[0]
@@ -142,6 +177,7 @@ if not marca_atual:
                     width="stretch",
                 )
 
+            #DADOS PEUGEOT BOT WORDS
             with sub_col2:
                 bot_words = words_list.calcular_lift_por_marca('Peugeot', 1, sort=True)
                 palavra_bot = bot_words.index[0]
@@ -155,18 +191,21 @@ if not marca_atual:
                     width="stretch",
                 )
 
-        #Espaço entre botões
+        #ESPAÇO ENTRE BOTÕES
         st.space('large')
+        #ESPAÇO ENTRE BOTÕES
 
-        # BOTÕES DE BAIXO
+        #BOTÕES DE BAIXO
         col1, col2 = st.columns(2, gap="large")
 
+        #BOTÃO CITROEN
         with col1:
         
             is_citroen_active = botao_customizado("Citroen", "citroen")
         
             sub_col1, sub_col2 = st.columns(2, border=True)
 
+            #DADOS CITROEN TOP WORDS
             with sub_col1:
                 top_words = words_list.calcular_lift_por_marca('Citroen', 1, sort=False)
                 palavra_top = top_words.index[0]
@@ -180,6 +219,7 @@ if not marca_atual:
                     width="stretch",
             )
 
+        #DADOS CITROEN BOT WORDS
         with sub_col2:
             bot_words = words_list.calcular_lift_por_marca('Citroen', 1, sort=True)
             palavra_bot = bot_words.index[0]
@@ -193,12 +233,14 @@ if not marca_atual:
                 width="stretch",
             )
 
+        #BOTÅO RAM
         with col2:
         
             is_ram_active = botao_customizado("Ram", "ram")
         
             sub_col1, sub_col2 = st.columns(2, border=True)
 
+            #DADOS RAM TOP WORDS
             with sub_col1:
                 top_words = words_list.calcular_lift_por_marca('RAM', 1, sort=False)
                 palavra_top = top_words.index[0]
@@ -212,6 +254,7 @@ if not marca_atual:
                     width="stretch",
                 )
 
+            #DADOS RAM BOT WORDS
             with sub_col2:
                 bot_words = words_list.calcular_lift_por_marca('RAM', 1, sort=True)
                 palavra_bot = bot_words.index[0]
@@ -227,9 +270,11 @@ if not marca_atual:
 
 else:
 
+    #--------------------------CONFIG PÁGINA DE DETALHES DE CADA MARCA---------------#
     with st.spinner("Loading..."):
         time.sleep(1)
 
+        #SESSION STATE BS
         if 'pagina_atual' not in st.session_state:
             st.session_state['pagina_atual'] = 'home'
         if 'botao_selecionado' not in st.session_state:
@@ -237,17 +282,20 @@ else:
         if 'valor_botao' not in st.session_state:
             st.session_state['valor_botao'] = None
 
+        #---------------CONFIG DA PÁGINA HOME DE DETALHES----------------------------#
         if marca_atual:
             logo = visuals.links_logos(marca_atual)
             marca_cor = visuals.coes_marcas(marca_atual)
 
+            #RAM PRECISA SER EDITADA PORQUE O NOME DELA NA DB NÃO SEGUE O PADRÃO DE LETRA MAIÚSCULA NO INICIO
             if st.session_state['pagina_atual'] == 'home':
 
                 if marca_atual == 'Ram':
                     marca_atual_atualizada = 'RAM'
                 else:
                     marca_atual_atualizada = marca_atual
-                
+
+                #SETANDO BOTÃO DE VOLTAR E LOGO PRA CADA MARCA NO TOPO DA PÁGINA
                 col_voltar, col_vazia, col_logo, col_vazia = st.columns([1, 3, 1, 4], border=False)
                 with col_voltar:
                     if st.button("<-"):
@@ -265,9 +313,14 @@ else:
                 with col_vazia:
                     st.empty()
 
+                #espaço vazio
                 st.space()
+                #espaço vazio
 
+                #SETANDO DUAS COLUNAS PRINCIPAIS
                 col_top_words, col_bot_words = st.columns(2, border=False)
+
+                #COL TOP WORDS
                 with col_top_words:
                     
                     sc1, sc2, sc3 = st.columns(3)
@@ -278,6 +331,7 @@ else:
                     with sc3:
                         st.subheader('KM MÉDIO', anchor=False, divider=marca_cor)
 
+                    #EVOCANDO FUNÇÃO LIFT + CRIANDO UM LOOP QUE CRIA UM BOTÃO PRA CADA PALAVRA MAIS USADA
                     top_words = words_list.calcular_lift_por_marca(marca_atual_atualizada, 10, sort=False)
 
                     sub_col_words, sub_col_scores, sub_col_km_medio = st.columns(3, vertical_alignment="top", border=False)
@@ -303,6 +357,7 @@ else:
                             st.markdown(f"{km_medio:.0f}")
                             st.space(size="stretch")
 
+                #COL BOT WORDS
                 with col_bot_words:
 
                     sc1, sc2, sc3 = st.columns(3)
@@ -312,7 +367,8 @@ else:
                         st.subheader('SCORE', anchor=False, divider=marca_cor)
                     with sc3:
                         st.subheader('MARCAS', anchor=False, divider=marca_cor)
-                    
+
+                    #FAZENDO O MESMO QUE FIZ EM CIMA PORÉM PRAS BOT WORDS
                     sub_col_words, sub_col_scores, sub_col_marcas = st.columns(3, vertical_alignment="top", border=False)
                     for i in range(10):
                         
@@ -337,6 +393,7 @@ else:
                             st.markdown(marcas_associadas['marca'].values[0])
                             st.space("stretch")
 
+            #-------------------------CONFIG DA PÁGINA SUB-DETAILS--------------------------------#
             elif st.session_state['pagina_atual'] == 'detalhes':
                 botao = st.session_state['botao_selecionado']
                 valor_botao = st.session_state['valor_botao']
@@ -346,8 +403,10 @@ else:
                 else:
                     marca_atual_atualizada = marca_atual
 
+                #EVOCANDO FUNC DE CALCULAR LIFT
                 top_words = words_list.calcular_lift_por_marca(marca_atual_atualizada, 12, sort=True)
 
+                # BOTÃO VOLTAR + MOSTRA DE DADOS DA PALAVRA SELECIONADA
                 col_voltar, col_vazia, col_palavra, col_vazia = st.columns([1, 3, 1, 4])
                 with col_voltar:
                     if st.button("<-"):
@@ -366,26 +425,19 @@ else:
                     )
                 st.space("medium")
 
+                #PALAVRAS ATRELADAS À PALAVRA ESCOLHIDA
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     for i in range(0, 4):
-                        with st.container(border=True):
-                            palavra_relacionada = top_words.index[i]
-                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
-                            st.space("stretch")
+                        botao_palavra_clicavel(top_words.index[i])
                 with col2:
                     for i in range(4, 8):
-                        with st.container(border=True):
-                            palavra_relacionada = top_words.index[i]
-                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
-                            st.space("stretch")
+                        botao_palavra_clicavel(top_words.index[i])
                 with col3:
                     for i in range(8, 12):
-                        with st.container(border=True):
-                            palavra_relacionada = top_words.index[i]
-                            st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
-                            st.space("stretch")
+                        botao_palavra_clicavel(top_words.index[i])
 
+            #-----------------CONFIG DA PÁGINA SUB-DETAILS PORÉM PARA PALAVRAS BOT----------------#
             elif st.session_state['pagina_atual'] == 'detalhes_bot':
                 botao = st.session_state['botao_selecionado']
                 valor_botao = st.session_state['valor_botao']
@@ -395,8 +447,10 @@ else:
                 else:
                     marca_atual_atualizada = marca_atual
 
+                #EVOCANDO FUNC DE CALCULAR LIFT
                 top_words = words_list.calcular_lift_por_marca(marca_atual_atualizada, 12, sort=False)
 
+                # BOTÃO VOLTAR + MOSTRA DE DADOS DA PALAVRA SELECIONADA
                 col_voltar, col_vazia, col_palavra, col_vazia = st.columns([1, 3, 1, 4])
                 with col_voltar:
                     if st.button("<-"):
@@ -415,6 +469,7 @@ else:
                     )
                 st.space("medium")
 
+                # PALAVRAS ATRELADAS À PALAVRA ESCOLHIDA
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     for i in range(0, 4):
