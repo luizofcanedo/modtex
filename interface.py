@@ -1,7 +1,4 @@
 import streamlit as st
-from sqlalchemy import create_engine
-from sqlalchemy.exc import OperationalError
-import pandas as pd
 import words_list
 from st_click_detector import click_detector
 import visuals
