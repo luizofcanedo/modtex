@@ -48,32 +48,6 @@ def botao_customizado(nome_marca, css_class):
             return True
     return st.session_state.get('marca_selecionada') == nome_marca
 
-#-----------------script de botão genérico -----------------#
-def botao_palavra(texto):
-    st.markdown(f"""
-            <div class="btn-base btn-word" style="width: 100%; height: 100px; margin-bottom: 10px;">
-            {texto}
-        </div>
-        """, unsafe_allow_html=True)
-
-def botao_palavra_clicavel(palavra):
-    id_limpo = palavra.replace(" ", "_").lower()
-    btn_id = f"btn_{id_limpo}"
-    html_code = f"""
-        <style>
-            {css_content}
-        </style>
-        <div style="display: flex; justify-content: center; margin-bottom: 15px;">
-            <a href="#" id="{btn_id}" style="text-decoration: none; color: inherit;">
-                <div class="btn-word btn-text">
-                    {palavra}
-                </div>
-            </a>
-        </div>
-    """
-    detector_response = click_detector(html_code)
-    return detector_response == btn_id
-
 #-----------------------------PÁGINA INICIAL-----------------------------#
 marca_atual = st.session_state.get('marca_selecionada')
 
@@ -270,17 +244,153 @@ if not marca_atual:
 
 else:
 
+    # SESSION STATE BS
+    if 'pagina_atual' not in st.session_state:
+        st.session_state['pagina_atual'] = 'home'
+    if 'botao_selecionado' not in st.session_state:
+        st.session_state['botao_selecionado'] = None
+    if 'valor_botao' not in st.session_state:
+        st.session_state['valor_botao'] = None
+
+
+    # -------------------------CONFIG BOTAO GENÉRICO----------------------------------#
+    def botao_palavra(texto):
+        st.markdown(f"""
+                <div class="btn-base btn-word" style="width: 100%; height: 100px; margin-bottom: 10px;">
+                {texto}
+            </div>
+            """, unsafe_allow_html=True)
+
+
+    def botao_palavra_clicavel(palavra, val_bot=None, bot_sel=None):
+        id_limpo = palavra.replace(" ", "_")
+        btn_id = f"btn_{id_limpo}"
+        html_code = f"""
+            <style>
+                {css_content}
+            </style>
+            <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+                <a href="#" id="{btn_id}" style="text-decoration: none; color: inherit;">
+                    <div class="btn-word btn-text">
+                        {palavra}
+                    </div>
+                </a>
+            </div>
+        """
+        detector_response = click_detector(html_code)
+
+        if marca_atual == 'Ram':
+            marca_atual_atualizada = 'RAM'
+        else:
+            marca_atual_atualizada = marca_atual
+
+        top_words = words_list.calcular_lift_por_marca(marca_atual_atualizada, 1, sort=True)
+
+        if detector_response == btn_id:
+            if st.session_state.get('pagina_atual') != 'home':
+                st.session_state['pagina_atual'] = 'detalhes'
+                st.session_state['botao_selecionado'] = bot_sel
+                st.session_state['valor_botao'] = val_bot
+                st.rerun()
+                return True
+        return st.session_state.get('pagina_atual') == 'home'
+
+    #--------------------------DEF PAGINA SUB-DETAILS-------------------------------#
+    def sub_details_top():
+
+        if marca_atual == 'Ram':
+            marca_atual_atualizada = 'RAM'
+        else:
+            marca_atual_atualizada = marca_atual
+
+        # EVOCANDO FUNC DE CALCULAR LIFT PRO PRIMEIRO USO
+        valor_botao = st.session_state['valor_botao']
+        target_word = st.session_state['botao_selecionado']
+        df_palavras = words_list.contagem_palavras(filter=True, target_word=target_word, sorted=True)
+        palavras = df_palavras['words']
+
+        lista_palavras = []
+        for i in range(0, 9):
+            palavra = palavras.values[i]
+            lista_palavras.append(palavra)
+
+        # BOTÃO VOLTAR + MOSTRA DE DADOS DA PALAVRA SELECIONADA
+        col_voltar, col_vazia, col_palavra, col_vazia = st.columns([1, 3, 1, 4])
+        with col_voltar:
+            if st.button("<-"):
+                st.session_state['pagina_atual'] = 'home'
+                st.session_state['botao_selecionado'] = None
+                st.session_state['valor_botao'] = None
+                st.rerun()
+        with col_vazia:
+            st.empty()
+        with col_palavra:
+            st.metric(
+                label="Palavra selecionada",
+                value=target_word,
+                delta=f"{valor_botao:.2f}",
+                border=True
+            )
+        st.space("medium")
+
+        # PALAVRAS ATRELADAS À PALAVRA ESCOLHIDA
+        col1, col2, col3 = st.columns(3, border=False)
+        with col1:
+            sub_col1, sub_col2 = st.columns([3, 1], border=False)
+            with sub_col1:
+                for i in range(0, 3):
+                    with st.container(height=150, width=340, border=False, vertical_alignment="center"):
+                        st.empty()
+                        if st.button(palavras.values[i]):
+                            st.session_state['botao_selecionado'] = lista_palavras[i]
+                            st.session_state['valor_botao'] = words_list.obter_score_palavra(marca_atual_atualizada, target_word)
+                            st.rerun()
+
+            with sub_col2:
+                st.space(13)
+                st.container(border=True, height=70, width=70)
+                st.space(65)
+                st.container(border=True, height=70, width=70)
+                st.space(65)
+                st.container(border=True, height=70, width=70)
+        with col2:
+            sub_col3, sub_col4 = st.columns([3, 1])
+            with sub_col3:
+                for i in range(3, 6):
+                    with st.container(height=150, width=340, border=False, vertical_alignment="center"):
+                        st.empty()
+                        if st.button(palavras.values[i]):
+                            st.session_state['botao_selecionado'] = lista_palavras[i]
+                            st.session_state['valor_botao'] = words_list.obter_score_palavra(marca_atual_atualizada, target_word)
+                            st.rerun()
+            with sub_col4:
+                st.space(13)
+                st.container(border=True, height=70, width=70)
+                st.space(65)
+                st.container(border=True, height=70, width=70)
+                st.space(65)
+                st.container(border=True, height=70, width=70)
+        with col3:
+            sub_col5, sub_col6 = st.columns([3, 1], border=False)
+            with sub_col5:
+                for i in range(6, 9):
+                    with st.container(height=150, width=340, border=False, vertical_alignment="center"):
+                        st.empty()
+                        if st.button(palavras.values[i]):
+                            st.session_state['botao_selecionado'] = lista_palavras[i]
+                            st.session_state['valor_botao'] = words_list.obter_score_palavra(marca_atual_atualizada, target_word)
+                            st.rerun()
+            with sub_col6:
+                st.space(13)
+                st.container(border=True, height=70, width=70)
+                st.space(65)
+                st.container(border=True, height=70, width=70)
+                st.space(65)
+                st.container(border=True, height=70, width=70)
+
     #--------------------------CONFIG PÁGINA DE DETALHES DE CADA MARCA---------------#
     with st.spinner("Loading..."):
         time.sleep(1)
-
-        #SESSION STATE BS
-        if 'pagina_atual' not in st.session_state:
-            st.session_state['pagina_atual'] = 'home'
-        if 'botao_selecionado' not in st.session_state:
-            st.session_state['botao_selecionado'] = None
-        if 'valor_botao' not in st.session_state:
-            st.session_state['valor_botao'] = None
 
         #---------------CONFIG DA PÁGINA HOME DE DETALHES----------------------------#
         if marca_atual:
@@ -395,47 +505,7 @@ else:
 
             #-------------------------CONFIG DA PÁGINA SUB-DETAILS--------------------------------#
             elif st.session_state['pagina_atual'] == 'detalhes':
-                botao = st.session_state['botao_selecionado']
-                valor_botao = st.session_state['valor_botao']
-
-                if marca_atual == 'Ram':
-                    marca_atual_atualizada = 'RAM'
-                else:
-                    marca_atual_atualizada = marca_atual
-
-                #EVOCANDO FUNC DE CALCULAR LIFT
-                top_words = words_list.calcular_lift_por_marca(marca_atual_atualizada, 12, sort=True)
-
-                # BOTÃO VOLTAR + MOSTRA DE DADOS DA PALAVRA SELECIONADA
-                col_voltar, col_vazia, col_palavra, col_vazia = st.columns([1, 3, 1, 4])
-                with col_voltar:
-                    if st.button("<-"):
-                        st.session_state['pagina_atual'] = 'home'
-                        st.session_state['botao_selecionado'] = None
-                        st.session_state['valor_botao'] = None
-                        st.rerun()
-                with col_vazia:
-                    st.empty()
-                with col_palavra:
-                    st.metric(
-                        label="Palavra selecionada",
-                        value=botao,
-                        delta=f"{valor_botao:.2f}",
-                        border=True
-                    )
-                st.space("medium")
-
-                #PALAVRAS ATRELADAS À PALAVRA ESCOLHIDA
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    for i in range(0, 4):
-                        botao_palavra_clicavel(top_words.index[i])
-                with col2:
-                    for i in range(4, 8):
-                        botao_palavra_clicavel(top_words.index[i])
-                with col3:
-                    for i in range(8, 12):
-                        botao_palavra_clicavel(top_words.index[i])
+                sub_details_top()
 
             #-----------------CONFIG DA PÁGINA SUB-DETAILS PORÉM PARA PALAVRAS BOT----------------#
             elif st.session_state['pagina_atual'] == 'detalhes_bot':
@@ -472,19 +542,19 @@ else:
                 # PALAVRAS ATRELADAS À PALAVRA ESCOLHIDA
                 col1, col2, col3 = st.columns(3)
                 with col1:
-                    for i in range(0, 4):
+                    for i in range(0, 3):
                         with st.container(border=True):
                             palavra_relacionada = top_words.index[i]
                             st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
                             st.space("stretch")
                 with col2:
-                    for i in range(4, 8):
+                    for i in range(3, 7):
                         with st.container(border=True):
                             palavra_relacionada = top_words.index[i]
                             st.subheader(f"{palavra_relacionada}", width="stretch", anchor=False)
                             st.space("stretch")
                 with col3:
-                    for i in range(8, 12):
+                    for i in range(7, 11):
                         with st.container(border=True):
                             palavra_relacionada = top_words.index[i]
                             st.subheader(f"{palavra_relacionada}", width="stretch",anchor=False)

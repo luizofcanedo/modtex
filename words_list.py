@@ -102,3 +102,31 @@ def marcas_associadas(target_word, marca_alvo):
     df_sorted = df_counter.sort_values(by='contagem', ascending=False)
 
     return df_sorted
+
+
+def obter_score_palavra(marca_alvo, palavra_alvo):
+    df_completo = contagem_palavras()
+
+    matriz = df_completo.pivot_table(
+        index='words',
+        columns='marca',
+        values='contagem',
+        fill_value=0
+    )
+
+    matriz = matriz[matriz.sum(axis=1) > 50]
+
+    smoothing = 1e-6
+    freq_relativa = (matriz + smoothing).div((matriz + smoothing).sum(axis=0), axis=1)
+    freq_global = freq_relativa.mean(axis=1)
+    lift = freq_relativa.div(freq_global, axis=0)
+
+    score_log = np.log(lift)
+
+    palavra_alvo = palavra_alvo.lower()
+
+    try:
+        score = score_log.loc[palavra_alvo, marca_alvo]
+        return score
+    except KeyError:
+        return None
